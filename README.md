@@ -5,7 +5,7 @@
 
 ---
 
-[在线 Demo](https://blog.coreyai.cn/) · [快速部署](#二快速部署) · [技术架构](#三技术架构) · [运维指南](#四生产部署与运维) · [变更日志](docs/changelogs/)
+[在线 Demo](https://blog.coreyai.cn/) · [快速部署](#二快速部署) · [技术架构](#三技术架构)
 
 ---
 
@@ -137,39 +137,7 @@ my-blog/
 
 ---
 
-## 四、生产部署与运维
-
-> 详细部署手册与更多复杂场景说明请查阅：[`docs/项目部署操作手册.md`](docs/项目部署操作手册.md)。
-
-### 4.1 核心运维命令速查
-
-```bash
-# ============ 1. 服务器代码/版本升级 ============
-# 保留业务数据，自动跑增量 SQL 迁移
-GITHUB_REPO=YuanYii/my-blog-prov DEPLOY_MODE=full sudo -E ./deploy-server.sh
-
-# ============ 2. 服务状态与日志查看 ============
-journalctl -u myblog -f               # 实时查看后端服务运行日志
-tail -f /opt/myblog/logs/app.log       # 查看应用标准输出日志
-systemctl restart myblog               # 重启后端服务
-
-# ============ 3. 数据库备份与导入 ============
-bash scripts/sqlite-export.sh -o /tmp/migration.sql.gz.enc  # 加密导出 SQLite
-bash scripts/sqlite-import.sh /opt/myblog/db/blog.db /tmp/migration.sql.gz.enc # 解密导入 SQLite
-```
-
-### 4.2 部署注意事项与环境变量
-
-| 环境变量 / 配置 | 说明 |
-|-----------------|------|
-| **`GITHUB_REPO`** | 部署物料源仓库，设置为 `YuanYii/my-blog-prov` |
-| **`JWT_SECRET`** | 首次部署自动生成，位于 `/etc/myblog/myblog.env`，**切勿随意修改**，否则已登录用户将被踢出 |
-| **`CORS_ORIGINS`** | 跨域域名配置，编辑 `/etc/myblog/myblog.env` 设置您的真实域名 |
-| **`ENABLE_HTTPS`** | 设置 `ENABLE_HTTPS=1 HTTPS_DOMAIN=域名 HTTPS_EMAIL=邮箱` 可自动申请并配置 Let's Encrypt 证书 |
-
----
-
-## 五、未来路线图 (Roadmap)
+## 四、未来路线图 (Roadmap)
 
 - [ ] **数据清理**：提供按月归档与 `page_view` 历史日志清理工具
 - [ ] **评论体验优化**：支持二级评论回复与树状结构展现
@@ -178,6 +146,6 @@ bash scripts/sqlite-import.sh /opt/myblog/db/blog.db /tmp/migration.sql.gz.enc #
 
 ---
 
-## 六、开源协议
+## 五、开源协议
 
 本项目基于 [MIT License](LICENSE) 协议开源。欢迎提交 Issue 与 Pull Request！
