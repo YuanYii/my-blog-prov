@@ -5,7 +5,7 @@
 
 ---
 
-[在线 Demo](https://blog.coreyai.cn/) · [快速部署](#二快速部署) · [技术架构](#三技术架构)
+[在线 Demo](https://blog.coreyai.cn/) · [快速部署](#二快速部署) · [备份配置](#三私有数据备份仓库配置-可选) · [技术架构](#四技术架构)
 
 ---
 
@@ -71,9 +71,27 @@ curl -s http://127.0.0.1:28080/api/v1/health
 
 ---
 
-## 三、技术架构
+## 三、私有数据备份仓库配置 (可选)
 
-### 3.1 技术栈总览
+系统支持将数据库及上传附件 AES-256 加密打包并全自动保存至您自己的 **GitHub 私有备份仓库**：
+
+1. **创建私有备份仓库**：在 GitHub 新建一个仓库（例如 `yourname/my-blog-backup`），设为 **Private**，并务必勾选 **[x] Add a README file**（初始化 `main` 分支）。
+2. **生成 Fine-grained PAT Token**：前往 GitHub **Settings -> Developer Settings -> Fine-grained tokens**：
+   - **Repository access**：选择 *Only select repositories* 并选中备份仓库。
+   - **Permissions**：在 *Repository permissions* 中将 **Contents** 设为 **Read and write**。
+3. **服务器配置生效**：编辑服务器配置文件 `/etc/myblog/myblog.env` 填入配置（保存后无需重启）：
+   ```env
+   BACKUP_ENCRYPTION_PASSWORD=您的自定义8位以上解密密码
+   GITHUB_BACKUP_REPO=yourname/my-blog-backup
+   BACKUP_GITHUB_TOKEN=github_pat_xxxxxx
+   ```
+4. **触发备份**：登录管理后台点击 **“数据备份”**，系统将全自动加密打包并上传发布至您的私有仓库中。
+
+---
+
+## 四、技术架构
+
+### 4.1 技术栈总览
 
 | 层级 | 选型 | 说明 |
 |------|------|------|
@@ -84,7 +102,7 @@ curl -s http://127.0.0.1:28080/api/v1/health
 | **前端样式** | Tailwind CSS + Vanilla CSS | 响应式现代化界面 |
 | **运维环境** | Nginx + OpenJDK 8 + Systemd | 零 Docker 纯净宿主机运行 |
 
-### 3.2 系统架构拓扑
+### 4.2 系统架构拓扑
 
 ```
 ┌───────────────────────────────────────────────────────────┐
@@ -113,7 +131,7 @@ curl -s http://127.0.0.1:28080/api/v1/health
             └────────────────────┘        └────────────────────┘
 ```
 
-### 3.3 代码结构规范
+### 4.3 代码结构规范
 
 ```text
 my-blog/
@@ -137,7 +155,7 @@ my-blog/
 
 ---
 
-## 四、未来路线图 (Roadmap)
+## 五、未来路线图 (Roadmap)
 
 - [ ] **数据清理**：提供按月归档与 `page_view` 历史日志清理工具
 - [ ] **评论体验优化**：支持二级评论回复与树状结构展现
@@ -146,6 +164,6 @@ my-blog/
 
 ---
 
-## 五、开源协议
+## 六、开源协议
 
 本项目基于 [MIT License](LICENSE) 协议开源。欢迎提交 Issue 与 Pull Request！
