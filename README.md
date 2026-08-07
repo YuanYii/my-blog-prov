@@ -5,7 +5,7 @@
 
 ---
 
-[在线 Demo](https://blog.coreyai.cn/) · [快速部署](#二快速部署) · [备份配置](#三私有数据备份仓库配置-可选) · [技术架构](#四技术架构)
+[在线 Demo](https://blog.coreyai.cn/) · [快速部署](#二快速部署) · [界面展示](#三界面展示) · [技术架构](#四技术架构) · [运维指南](#五生产部署与运维) · [变更日志](docs/changelogs/)
 
 ---
 
@@ -13,10 +13,11 @@
 
 - **前台公开体验**：静态 SEO 预渲染与渐进增强、文章浏览、归档、分类、标签云、全局搜索、RSS 订阅。
 - **全能管理后台**：
-  - **内容管理**：文章 Markdown 编辑、批量 ZIP 模板导入、一文一附件管理、分类与标签维护、评论审核。
-  - **系统运维**：仪表盘 KPI 聚合与访客 IP 归属地统计、设备白名单绑定、全站 IP 限流与封禁、全局审计日志。
+  - **内容管理**：文章 Markdown 编辑、一文一附件管理、分类与标签维护、评论审核。
+  - **系统运维**：仪表盘 KPI 聚合与访客 IP 归属地统计、设备授权管理、全站 IP 限流与封禁、全局审计日志。
   - **数据与升级**：数据库 AES-256 加密备份与恢复、管理后台 Web UI 一键升级（含流式日志与失败回滚）。
 - **极简极轻架构**：默认嵌入式 SQLite 数据库，无需安装复杂的数据库服务，1C2G VPS 即可流畅运行。
+- **前后端分离与自定义扩展**：基于标准的 RESTful API 架构，业务逻辑与 UI 交互彻底解耦。提供全量 92 个 API 端点规范文档（详见 [docs/API接口与自定义前端开发指南.md](docs/API接口与自定义前端开发指南.md)），支持开发者零门槛自定义扩展移动端小程序、桌面客户端或个性化前端主题。
 
 ---
 
@@ -25,7 +26,7 @@
 | 模块 | 功能说明 |
 |------|----------|
 | **前台公开** | 首页 Hero / 文章详情（SEO 渐进增强）/ 归档 / 分类 / 标签云 / 关于页 / 全局搜索 / RSS 订阅 |
-| **管理后台** | 仪表盘（KPI + 30天趋势 + 访客 IP 归属地）/ 文章增删改与 ZIP 导入 / 附件管理 / 评论审核 / 分类与标签 / 站点设置 / 审计日志 / 设备白名单 / 数据备份与恢复 / Web UI 一键升级 |
+| **管理后台** | 仪表盘（KPI + 30天趋势 + 访客 IP 归属地）/ 文章增删改/ 附件管理 / 评论审核 / 分类与标签 / 站点设置 / 审计日志 / 设备白名单 / 数据备份与恢复 / Web UI 一键升级 |
 | **系统安全与性能** | JWT 鉴权 / 设备绑定 / API 路由白名单 / 日志 traceId 全链路串联 / IP 限流封禁 / 前端全静态预渲染 |
 
 ---
@@ -71,27 +72,25 @@ curl -s http://127.0.0.1:28080/api/v1/health
 
 ---
 
-## 三、私有数据备份仓库配置 (可选)
+## 三、界面展示
 
-系统支持将数据库及上传附件 AES-256 加密打包并全自动保存至您自己的 **GitHub 私有备份仓库**：
+### 3.1 管理后台 - 聚合仪表盘
+![管理后台仪表盘](docs/images/admin-dashboard.png)
 
-1. **创建私有备份仓库**：在 GitHub 新建一个仓库（例如 `yourname/my-blog-backup`），设为 **Private**，并务必勾选 **[x] Add a README file**（初始化 `main` 分支）。
-2. **生成 Fine-grained PAT Token**：前往 GitHub **Settings -> Developer Settings -> Fine-grained tokens**：
-   - **Repository access**：选择 *Only select repositories* 并选中备份仓库。
-   - **Permissions**：在 *Repository permissions* 中将 **Contents** 设为 **Read and write**。
-3. **服务器配置生效**：编辑服务器配置文件 `/etc/myblog/myblog.env` 填入配置（保存后无需重启）：
-   ```env
-   BACKUP_ENCRYPTION_PASSWORD=您的自定义8位以上解密密码
-   GITHUB_BACKUP_REPO=yourname/my-blog-backup
-   BACKUP_GITHUB_TOKEN=github_pat_xxxxxx
-   ```
-4. **触发备份**：登录管理后台点击 **“数据备份”**，系统将全自动加密打包并上传发布至您的私有仓库中。
+### 3.2 博客前台 - 首页
+![博客前台首页](docs/images/home-page.png)
+
+### 3.3 博客前台 - 文章详情页
+![文章详情页](docs/images/post-detail.png)
+
+### 3.4 博客前台 - 关于我页面
+![关于我页面](docs/images/about-page.png)
 
 ---
 
 ## 四、技术架构
 
-### 4.1 技术栈总览
+### 3.1 技术栈总览
 
 | 层级 | 选型 | 说明 |
 |------|------|------|
@@ -102,7 +101,7 @@ curl -s http://127.0.0.1:28080/api/v1/health
 | **前端样式** | Tailwind CSS + Vanilla CSS | 响应式现代化界面 |
 | **运维环境** | Nginx + OpenJDK 8 + Systemd | 零 Docker 纯净宿主机运行 |
 
-### 4.2 系统架构拓扑
+### 3.2 系统架构拓扑
 
 ```
 ┌───────────────────────────────────────────────────────────┐
@@ -131,7 +130,7 @@ curl -s http://127.0.0.1:28080/api/v1/health
             └────────────────────┘        └────────────────────┘
 ```
 
-### 4.3 代码结构规范
+### 3.3 代码结构规范
 
 ```text
 my-blog/
@@ -155,7 +154,55 @@ my-blog/
 
 ---
 
-## 五、未来路线图 (Roadmap)
+## 五、生产部署与运维
+
+> 详细部署手册与更多复杂场景说明请查阅：[`docs/项目部署操作手册.md`](docs/项目部署操作手册.md)。
+
+### 5.1 核心运维命令速查
+
+```bash
+# ============ 1. 服务器代码/版本升级 ============
+# 保留业务数据，自动跑增量 SQL 迁移
+GITHUB_REPO=YuanYii/my-blog-prov DEPLOY_MODE=full sudo -E ./deploy-server.sh
+
+# ============ 2. 服务状态与日志查看 ============
+journalctl -u myblog -f               # 实时查看后端服务运行日志
+tail -f /opt/myblog/logs/app.log       # 查看应用标准输出日志
+systemctl restart myblog               # 重启后端服务
+
+# ============ 3. 数据库备份与导入 ============
+bash scripts/sqlite-export.sh -o /tmp/migration.sql.gz.enc  # 加密导出 SQLite
+bash scripts/sqlite-import.sh /opt/myblog/db/blog.db /tmp/migration.sql.gz.enc # 解密导入 SQLite
+```
+
+### 5.2 部署注意事项与环境变量
+
+| 环境变量 / 配置 | 说明 |
+|-----------------|------|
+| **`GITHUB_REPO`** | 部署物料源仓库，设置为 `YuanYii/my-blog-prov` |
+| **`JWT_SECRET`** | 首次部署自动生成，位于 `/etc/myblog/myblog.env`，**切勿随意修改**，否则已登录用户将被踢出 |
+| **`CORS_ORIGINS`** | 跨域域名配置，编辑 `/etc/myblog/myblog.env` 设置您的真实域名 |
+| **`ENABLE_HTTPS`** | 设置 `ENABLE_HTTPS=1 HTTPS_DOMAIN=域名 HTTPS_EMAIL=邮箱` 可自动申请并配置 Let's Encrypt 证书 |
+
+### 5.3 私有数据备份仓库配置 (可选)
+
+系统支持将数据库及上传附件 AES-256 加密打包并全自动保存至您自己的 **GitHub 私有备份仓库**：
+
+1. **创建私有备份仓库**：在 GitHub 新建一个仓库（例如 `yourname/my-blog-backup`），设为 **Private**，并务必勾选 **[x] Add a README file**（初始化 `main` 分支）。
+2. **生成 Fine-grained PAT Token**：前往 GitHub **Settings -> Developer Settings -> Fine-grained tokens**：
+   - **Repository access**：选择 *Only select repositories* 并选中备份仓库。
+   - **Permissions**：在 *Repository permissions* 中将 **Contents** 设为 **Read and write**。
+3. **服务器配置生效**：编辑服务器配置文件 `/etc/myblog/myblog.env` 填入配置（保存后无需重启）：
+   ```env
+   BACKUP_ENCRYPTION_PASSWORD=您的自定义8位以上解密密码
+   GITHUB_BACKUP_REPO=yourname/my-blog-backup
+   BACKUP_GITHUB_TOKEN=github_pat_xxxxxx
+   ```
+4. **触发备份**：登录管理后台点击 **“数据备份”**，系统将全自动加密打包并上传发布至您的私有仓库中。
+
+---
+
+## 六、未来路线图 (Roadmap)
 
 - [ ] **数据清理**：提供按月归档与 `page_view` 历史日志清理工具
 - [ ] **评论体验优化**：支持二级评论回复与树状结构展现
@@ -164,6 +211,6 @@ my-blog/
 
 ---
 
-## 六、开源协议
+## 七、开源协议
 
-本项目基于 [MIT License](LICENSE) 协议开源。欢迎提交 Issue 与 Pull Request！
+本项目基于 MIT License 协议开源。欢迎提交 Issue 与 Pull Request！
